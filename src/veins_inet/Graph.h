@@ -21,18 +21,6 @@
 #include <fstream>
 #include <sstream>
 
-class ItineraryRecord {// Ban ghi hanh trinh cua xe
-public:
-    std::string laneId, prevLaneId;
-    int stopTime;
-};
-
-class AGV {
-public:
-    std::string id;
-    ItineraryRecord *itinerary;
-};
-
 class Edge {
 private:
     std::string id, from, to;
@@ -194,6 +182,7 @@ public:
 class NodeVertex {
 public:
     Intersection *v;
+    double waitTime;
     std::vector<J_of_vertex*> j_of_vertex;
     NodeVertex *left, *right;
     J_of_vertex* search_j(std::string name) {
@@ -334,7 +323,7 @@ private:
                     v->setId(str_id);
                     v->setFrom(ne->e);
                     insertVertex(&vertices, v, new J_of_vertex(str));
-                    std::string newExitBuffer = ne->e->getId() + "-"
+                    std::string newExitBuffer = ne->e->getId() + "_"
                             + v->getId();
                     Vertex *eb = new Vertex();
                     eb->setId(newExitBuffer);
@@ -351,7 +340,7 @@ private:
                             c = 1;
                     }
                     if (c == 0) {
-                        std::string newExitBuffer = ne->e->getId() + "-"
+                        std::string newExitBuffer = ne->e->getId() + "_"
                                 + nv->v->getId();
                         Vertex *eb = new Vertex();
                         eb->setId(newExitBuffer);
@@ -489,6 +478,45 @@ public:
         return cur;
     }
 //    virtual ~Graph();
+};
+
+class ItineraryRecord { // Ban ghi hanh trinh cua xe
+public:
+    NodeVertex *v, *prevV;
+    int localWaitTime;
+};
+
+class AGV {
+public:
+    std::string id;
+    ItineraryRecord *itinerary;
+};
+
+class directIntersection {
+public:
+    std::string intersection, exitBuffer;
+    std::vector<std::string> direct;
+    static void readLineDirect(std::string str_line,
+            std::vector<directIntersection*> *directIn) {
+        directIntersection *direct = new directIntersection();
+        std::stringstream streamData(str_line);
+        std::string str;
+        while (getline(streamData, str, '$')) {
+            if (str.find('_') == -1) {
+                try {
+                    std::stod(str);
+                } catch (...) {
+                    direct->direct.push_back(str);
+                }
+            } else {
+                direct->exitBuffer = str;
+                direct->direct.push_back(str.substr(0, str.find('_')));
+                direct->intersection = str.substr(str.find('_') + 1,
+                        str.length());
+            }
+        }
+        directIn->push_back(direct);
+    }
 };
 
 #endif /* VEINS_GRAPH_H_ */

@@ -32,20 +32,20 @@ using namespace omnetpp;
 
 namespace veins {
 
-class HospitalControlApp : public TraCIDemoRSU11p {
+class HospitalControlApp: public TraCIDemoRSU11p {
 public:
     void initialize(int stage) override;
     void finish() override;
-    cMessage* sendBeacon;
-    Parser* graphGenerator;
+    cMessage *sendBeacon;
+    Parser *graphGenerator;
 
 protected:
-    void onBSM(DemoSafetyMessage* bsm) override;
-    void onWSM(BaseFrame1609_4* wsm) override;
-    void onWSA(DemoServiceAdvertisment* wsa) override;
+    void onBSM(DemoSafetyMessage *bsm) override;
+    void onWSM(BaseFrame1609_4 *wsm) override;
+    void onWSA(DemoServiceAdvertisment *wsa) override;
 
-    void handleSelfMsg(cMessage* msg) override;
-    void handlePositionUpdate(cObject* obj) override;
+    void handleSelfMsg(cMessage *msg) override;
+    void handlePositionUpdate(cObject *obj) override;
 
 private:
     std::vector<Crossing> crossings;
@@ -54,9 +54,14 @@ private:
     //virtual int getX2(int x);
     std::vector<AGV*> vhs;
     Graph *graph;
+    std::vector<directIntersection*> directIn;
+    std::vector<std::string> iVertex;
     bool hasStopped = false;
     int subscribedServiceId = 0;
     std::vector<std::string> message;
+    void readFileDirect();
+    void readFileIVertex(std::vector<std::string> *iVertex);
+    std::string searchE(std::string laneId);
     void readMessage(TraCIDemo11pMessage *bc);
     void exponentialSmoothing(NodeVertex *nv, double stopTime);
     void readLane(AGV *cur, std::string str);
