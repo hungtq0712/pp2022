@@ -20,6 +20,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include "Constant.h"
 
 class Edge {
 private:
@@ -63,10 +64,10 @@ private:
 
 public:
     int k;
-    double predictW, q, d;
+    double q, d, sTime = -1;
     Vertex() {
         k = 0;
-        predictW = 0;
+        w = 0;
     }
     void setId(std::string id) {
         this->id = id;
@@ -105,6 +106,13 @@ public:
     }
     double getW() {
         return this->w;
+    }
+    double getW4Find() {
+        if (sTime == -1
+                || (simTime().dbl() - sTime >= Constant::EXPIRED_TIME)) {
+            return 0; // Goi ham cua Hoang
+        } else
+            return w;
     }
 };
 
@@ -182,7 +190,7 @@ public:
 class NodeVertex {
 public:
     Intersection *v;
-    double waitTime;
+    double waitTime = 0;
     std::vector<J_of_vertex*> j_of_vertex;
     NodeVertex *left, *right;
     J_of_vertex* search_j(std::string name) {

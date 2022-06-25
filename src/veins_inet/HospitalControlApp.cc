@@ -18,6 +18,7 @@
 #include <iostream>
 #include "Zone.h"
 #include "Graph.h"
+#include <cmath>
 //#include "HashAPI.cpp"
 //#include "UnitTest.cpp"
 //#include "ReadFile.cpp"
@@ -64,7 +65,7 @@ void HospitalControlApp::initialize(int stage) {
 }
 
 void HospitalControlApp::finish() {
-    //Duoc goi khi RSU ket thuc cong viec
+//Duoc goi khi RSU ket thuc cong viec
     TraCIDemoRSU11p::finish();
     if (traci == NULL) {
         EV << "NULL eventually" << endl;
@@ -75,8 +76,8 @@ void HospitalControlApp::finish() {
     for (auto it = crossings.begin(); it != crossings.end(); it++) {
         //EV<<it->id<<" "<<it->rec->xMin<<endl;
     }
-    //if period is 0.1 => count = 1453
-    //if period is 0.2 => count = 801
+//if period is 0.1 => count = 1453
+//if period is 0.2 => count = 801
     EV << "#calling traci->getPersonIds(): " << count << endl;
     EV << "As 10 AGVs => T: 3796, W: 1811, %: 48%" << endl;
     EV << "As 10 + 1(flow 11) AGVs => T: 4521, W: 2334, %: 52%" << endl;
@@ -121,8 +122,8 @@ void HospitalControlApp::finish() {
             << "As 10 + 2(flow10) + 2(flow 11) + 10(flow0-9) AGVs => T: 9939, W: 5083, %: 51%"
             << endl;
 
-    //EV<<"As 10 + 2(flow 11) + 1(flow 2) AGVs => T: 4598, W: 2012, %: 44%"<<endl;
-    //EV<<"As 10 + 2(flow 11) + 2(flow 2) AGVs => T: 5448, W: 2661, %: 49%"<<endl;
+//EV<<"As 10 + 2(flow 11) + 1(flow 2) AGVs => T: 4598, W: 2012, %: 44%"<<endl;
+//EV<<"As 10 + 2(flow 11) + 2(flow 2) AGVs => T: 5448, W: 2661, %: 49%"<<endl;
     /*
      * 898.9(s)
      INFO (HospitalControlApp)myHospitalNetwork.rsu[0].appl: Total travelling time: 3485.9(s)
@@ -131,7 +132,7 @@ void HospitalControlApp::finish() {
      */
     EV << "As 10 + 1(flow 8) AGVs => T: 2709, W: 547, %: 20%" << endl;
     EV << "As 10 + 1(flow 2) AGVs => T: 3045.7, W: 875, %: 29%" << endl;
-    //EV<<"As 11 AGVs => T: 2720.8, W: 547, %: 20%"<<endl;
+//EV<<"As 11 AGVs => T: 2720.8, W: 547, %: 20%"<<endl;
     EV << "As 11 AGVs + 1(10) => T: 3239.9, W: 887.7, %: 27.4%" << endl;
 
     EV << "Total waiting time: " << Constant::TOTAL_WAITING_TIME * 0.1 << "(s)"
@@ -141,16 +142,16 @@ void HospitalControlApp::finish() {
     double percentage = Constant::TOTAL_WAITING_TIME * 10
             / Constant::TOTAL_TRAVELLING_TIME;
     EV << "% of waiting time: " << percentage << endl;
-    // statistics recording goes here
+// statistics recording goes here
 }
 
 void HospitalControlApp::onBSM(DemoSafetyMessage *bsm) {
-    //for my own simulation circle
+//for my own simulation circle
 }
 
 void HospitalControlApp::onWSM(BaseFrame1609_4 *wsm) {
-    // Your application has received a data message from another car or RSU
-    // code for handling the message goes here, see TraciDemo11p.cc for examples
+// Your application has received a data message from another car or RSU
+// code for handling the message goes here, see TraciDemo11p.cc for examples
     cPacket *enc = wsm->getEncapsulatedPacket();
     if (TraCIDemo11pMessage *bc = dynamic_cast<TraCIDemo11pMessage*>(enc)) {
         if (sendBeacon != NULL) {
@@ -208,8 +209,8 @@ void HospitalControlApp::onWSM(BaseFrame1609_4 *wsm) {
 }
 
 void HospitalControlApp::onWSA(DemoServiceAdvertisment *wsa) {
-    // Your application has received a service advertisement from another car or RSU
-    // code for handling the message goes here, see TraciDemo11p.cc for examples
+// Your application has received a service advertisement from another car or RSU
+// code for handling the message goes here, see TraciDemo11p.cc for examples
 }
 
 void HospitalControlApp::handleSelfMsg(cMessage *msg) {
@@ -218,8 +219,8 @@ void HospitalControlApp::handleSelfMsg(cMessage *msg) {
 
 void HospitalControlApp::handlePositionUpdate(cObject *obj) {
     TraCIDemoRSU11p::handlePositionUpdate(obj);
-    // the vehicle has moved. Code that reacts to new positions goes here.
-    // member variables such as currentPosition and currentSpeed are updated in the parent class
+// the vehicle has moved. Code that reacts to new positions goes here.
+// member variables such as currentPosition and currentSpeed are updated in the parent class
 
 }
 
@@ -257,19 +258,24 @@ void HospitalControlApp::readCrossing() {
     MyReadFile.close();
 }
 
-void HospitalControlApp::exponentialSmoothing(NodeVertex *nv, double stopTime) {
+void HospitalControlApp::exponentialSmoothing(NodeVertex *nv, double waitTime) {
     if (nv->v->k == 0) {
-        nv->v->predictW = stopTime;
-        nv->v->d = nv->v->q = 0;
+        nv->v->setW(waitTime);
+        nv->v->d = 0;
+        nv->v->q = 0;
         nv->v->k++;
     } else {
-        double error = stopTime - nv->v->predictW;
+        double error = waitTime - nv->v->getW();
         nv->v->q = Constant::GAMMA * error - (1 - Constant::GAMMA) * nv->v->q;
         nv->v->d = Constant::GAMMA * abs(error)
                 - (1 - Constant::GAMMA) * nv->v->d;
         double lambda = abs(nv->v->q / nv->v->d);
-        nv->v->predictW = lambda * stopTime + (1 - lambda) * nv->v->predictW;
-//        mes = mes + " " + std::to_string(nv->v->predictW);
+        if (std::isnan(lambda) == true)
+            lambda = 1;
+        nv->v->setW(lambda * waitTime + (1 - lambda) * nv->v->getW());
+        if (nv->v->getW() < 0) {
+            nv->v->setW(0);
+        }
     }
 }
 
@@ -303,8 +309,11 @@ void HospitalControlApp::readLane(AGV *cur, std::string str) {
         if (cur->itinerary->prevV != NULL) {
             exponentialSmoothing(cur->itinerary->prevV,
                     cur->itinerary->prevV->waitTime);
-            cur->itinerary->prevV->waitTime -= localWaitTime;
+            double e = cur->itinerary->prevV->waitTime;
+            cur->itinerary->prevV->waitTime = cur->itinerary->prevV->waitTime
+                    - localWaitTime;
             cur->itinerary->localWaitTime = 0;
+            cur->itinerary->prevV->v->sTime = simTime().dbl();
         }
         cur->itinerary->localWaitTime = 0;
         cur->itinerary->prevV = cur->itinerary->v;
@@ -335,9 +344,10 @@ void HospitalControlApp::readMessage(TraCIDemo11pMessage *bc) {
                 cur->itinerary->localWaitTime++;
                 cur->itinerary->v->waitTime += 0.1;
                 if (cur->itinerary->v->waitTime
-                        > cur->itinerary->v->v->predictW) {
+                        > cur->itinerary->v->v->getW()) {
                     exponentialSmoothing(cur->itinerary->v,
                             cur->itinerary->v->waitTime);
+                    cur->itinerary->v->v->sTime = simTime().dbl();
                 }
             }
         }

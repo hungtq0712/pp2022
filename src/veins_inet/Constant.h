@@ -27,21 +27,22 @@ using namespace veins;
 
 class Constant {
 public:
-    static constexpr const char* FIRST = "First vehicle";
-    static constexpr const char* RSU_IDENTIFY = "RSU";
+    static constexpr const char *FIRST = "First vehicle";
+    static constexpr const char *RSU_IDENTIFY = "RSU";
     static constexpr const long WANTED_ID = 52;
     static constexpr const double ZONE_LENGTH = 1.1;
-    static constexpr const char* NON_CAR = "";
+    static constexpr const char *NON_CAR = "";
     static constexpr const double GAMMA = 0.3;
     static constexpr const double DELTA_T = 1;
+    static constexpr const double EXPIRED_TIME = 5000;
     Constant();
     virtual ~Constant();
-    static TraCIMobility* activation;
+    static TraCIMobility *activation;
     static long TOTAL_WAITING_TIME;
     static double TOTAL_TRAVELLING_TIME;
 };
 
-static char* mergeContent(long Id){
+static char* mergeContent(long Id) {
     char *cstr = new char[strlen(Constant::RSU_IDENTIFY) + 1];
     strcpy(cstr, Constant::RSU_IDENTIFY);
     std::string str = std::to_string(Id);
@@ -53,19 +54,19 @@ static char* mergeContent(long Id){
     return ret;
 }
 
-static std::vector<std::string> split(const std::string& str, const std::string& delim)
-{
-    std::vector<std::string> tokens;
+static std::vector<std::string> split(const std::string &str,
+        const std::string &delim) {
+    std::vector < std::string > tokens;
     size_t prev = 0, pos = 0;
-    do
-    {
+    do {
         pos = str.find(delim, prev);
-        if (pos == std::string::npos) pos = str.length();
-        std::string token = str.substr(prev, pos-prev);
-        if (!token.empty()) tokens.push_back(token);
+        if (pos == std::string::npos)
+            pos = str.length();
+        std::string token = str.substr(prev, pos - prev);
+        if (!token.empty())
+            tokens.push_back(token);
         prev = pos + delim.length();
-    }
-    while (pos < str.length() && prev < str.length());
+    } while (pos < str.length() && prev < str.length());
     return tokens;
 }
 
