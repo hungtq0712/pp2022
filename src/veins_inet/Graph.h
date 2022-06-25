@@ -63,7 +63,7 @@ private:
     std::vector<Edge*> from, to;
 
 public:
-    int k;
+    int k, index = -1;
     double q, d, sTime = -1;
     Vertex() {
         k = 0;

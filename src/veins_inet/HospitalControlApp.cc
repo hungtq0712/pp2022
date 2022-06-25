@@ -57,6 +57,7 @@ void HospitalControlApp::initialize(int stage) {
 
         sendBeacon = new cMessage("send Beacon");
         graph = new Graph();
+        djisktra = new Djisktra();
         readFileDirect();
         readFileIVertex(&iVertex);
     } else if (stage == 1) {
@@ -277,6 +278,15 @@ void HospitalControlApp::exponentialSmoothing(NodeVertex *nv, double waitTime) {
             nv->v->setW(0);
         }
     }
+
+    int i = 0;
+    for (auto v : djisktra->vertices) {
+        if (v.compare(nv->v->getId()) == 0) {
+            break;
+        }
+        i++;
+    }
+    nv->v->index = i;
 }
 
 std::string HospitalControlApp::searchE(std::string laneId) {
