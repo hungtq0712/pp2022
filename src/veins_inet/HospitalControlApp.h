@@ -21,7 +21,6 @@
 
 #include "veins/veins.h"
 #include "Zone.h"
-//#include "Parser.cc"
 #include "veins/modules/application/ieee80211p/DemoBaseApplLayer.h"
 #include "veins/modules/application/traci/TraCIDemoRSU11p.h"
 #include "veins/modules/application/traci/TraCIDemo11pMessage_m.h"
@@ -50,8 +49,6 @@ protected:
 private:
     std::vector<Crossing> crossings;
     void readCrossing();
-    //virtual std::string getIdOfGLane(std::string str);
-    //virtual int getX2(int x);
     std::vector<AGV*> vhs;
     Graph *graph;
     bool hasStopped = false;
@@ -63,8 +60,6 @@ private:
     void readLane(AGV *cur, std::string str);
     double lastUpdate = -2.0;
     long count = 0;
-    //double getAvailablePerdestrian(std::string crossId, double _time);
-    //double getVeloOfPerdestrian(std::string crossId, double _time);
     void predictDispearTime();
     Djisktra* djisktra;
     std::string reRoute(AGV *cur, std::string routeId/*, double t*/);

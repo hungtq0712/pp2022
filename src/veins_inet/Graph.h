@@ -26,7 +26,6 @@ public:
     std::string laneId, prevLane = "";
     int prevVertex = -1;
     std::string station = "";
-    //int stopTime;
     int localWait;
 };
 
@@ -494,7 +493,6 @@ public:
         }
         return cur;
     }
-//    virtual ~Graph();
 };
 
 #endif /* VEINS_GRAPH_H_ */

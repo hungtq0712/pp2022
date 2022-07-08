@@ -27,7 +27,6 @@ CustomRectangle::CustomRectangle(std::string points) {
     for (int i = 0; i < 4; i++) {
         pos = points.find(" ");
         token = points.substr(0, pos);
-        //EV<<" $"<<token<<"$";
         if (i == 0) //this->A = string2Coord(token);
             this->xMin = std::atof(token.c_str());//std::stof(token);
         if (i == 1) //this->B = string2Coord(token);
@@ -40,7 +39,6 @@ CustomRectangle::CustomRectangle(std::string points) {
         points.erase(0, pos + 1);
     }
     this->area = abs((xMax - xMin)*(yMax - yMin));
-    //EV<<" "<<endl;
 }
 
 veins::Coord CustomRectangle::string2Coord(std::string point) {
@@ -62,24 +60,6 @@ veins::Coord CustomRectangle::string2Coord(std::string point) {
 double CustomRectangle::getArea() {
     return area;
 }
-
-/*double CustomRectangle::triangleArea(veins::Coord A, veins::Coord B, veins::Coord C) {
-    double x = A.distance(B);
-    double y = B.distance(C);
-    double z = C.distance(A);
-    double p = (x + y + z) / 2.0;
-    double S = sqrt(p*(p - x)*(p - y)*(p - z));
-    return S;
-}*/
-
-/*bool CustomRectangle::checkInside(veins::Coord I) {
-    if(I.x >= this->xMin && I.x <= this->xMax
-            && I.y <= this->yMax
-            && I.y >= this->yMin){
-        return true;
-    }
-    else return false;
-}*/
 
 bool CustomRectangle::checkAround(double x, double y) {
     if(x >= (this->xMin - AROUND) && x <= (this->xMax + AROUND)

@@ -26,7 +26,6 @@ Djisktra::Djisktra() {
     getItineraries("itinerary.txt");
     ShortestPath = (double *)malloc(numVertices*sizeof(double));
     this->expSmoothing = new ExponentialSmoothing(numVertices, numIVertices);
-    //this->expSmoothing->waitTime = (double *)malloc(numVertices*sizeof(double));
     for(int i = 0; i < numVertices; i++)
         ShortestPath[i] = 0;
 }
@@ -153,7 +152,6 @@ void Djisktra::createAndAddEdge(//std::vector<Quad> adjList[],
     adjList[u].push_back(make_tuple(weightEdge, v, indexOfV, v));
 } // createAndAddEdge
 
-//void Djisktra::generateAdj(std::vector<Quad> adjList[]){
 void Djisktra::generateAdj(){
     std::vector<int> locations;
     std::string src = "";
@@ -232,20 +230,12 @@ void Djisktra::DijkstrasAlgorithm(//std::vector <Quad> adjList[],
     for (std::vector<Quad>::iterator it = adjList[source].begin(); it != adjList[source].end(); it++){
       tempW = std::get<0>(*it);
       tempTrace = std::get<3>(*it);
-      /*if(tempTrace.compare(":J8") == 0){
-          EV<<"qqqqq"<<endl;
-      }*/
       tempIndex = std::get<2>(*it);
       if(!Constant::SHORTEST_PATH){
           weightVertices[tempIndex] = this->expSmoothing->getDampingValue(tempIndex, weightVertices[tempIndex], vertices[tempIndex]);
       }
 
       double newWeight = 0; //weight + tempW + 40*weightVertices[tempIndex];
-      /*if(trace.find("$E9$") != std::string::npos
-            && tempTrace.find("$-E9$") != std::string::npos
-              ){
-          EV<<"fdfsf";
-      }*/
       if(!isValidTrace(currLane, tempTrace)){
           continue;
       }
@@ -416,9 +406,5 @@ std::string Djisktra::getFinalSegment(std::string trace){
             return (" " + this->supplyDisposal[i].second);
         }
     }
-    /*double t = simTime().dbl();
-    if(t > 2.35){
-          EV<<"sdfsdfs";
-      }*/
     return "";
 }

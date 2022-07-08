@@ -17,31 +17,17 @@
 #define VEINS_INET_CUSTOMRECTANGLE_H_
 
 #include <string>
-//#include "inet/common/geometry/common/Coord.h"
 #include "veins/base/utils/Coord.h"
-//using namespace veins;
-//using namespace std;
 
 class CustomRectangle {
 public:
     CustomRectangle();
     CustomRectangle(std::string points);
-//    static inet::Coord string2Coord(std::string point);
     static veins::Coord string2Coord(std::string point);
-//    static double triangleArea(inet::Coord A, inet::Coord B, inet::Coord C);
-    //static double triangleArea(veins::Coord A, veins::Coord B, veins::Coord C);
     double getArea();
-//    bool checkInside(inet::Coord I);
     bool checkInside(double x, double y);
     bool checkAround(double x, double y);
     virtual ~CustomRectangle();
-
-    //veins::Coord A;
-    //veins::Coord B;
-    //veins::Coord C;
-    //veins::Coord D;
-    //
-
 private:
     static constexpr const double AROUND = 1;
     double xMin;

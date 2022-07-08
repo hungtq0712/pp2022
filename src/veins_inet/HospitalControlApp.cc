@@ -21,10 +21,6 @@
 #include <boost/algorithm/string.hpp>
 using namespace boost::algorithm;
 
-//#include "HashAPI.cpp"
-//#include "UnitTest.cpp"
-//#include "ReadFile.cpp"
-
 
 
 using namespace veins;
@@ -36,8 +32,6 @@ void HospitalControlApp::initialize(int stage)
     TraCIDemoRSU11p::initialize(stage);
     if(graphGenerator == NULL){
         graphGenerator = new Parser();
-        //graph = new Graph();
-        //graphGenerator->readFile();
     }
     if (stage == 0) {
         sendBeacon= new cMessage("send Beacon");
@@ -72,8 +66,6 @@ void HospitalControlApp::readCrossing(){
 
             if (i == 0) tmp.id = token;
             if (i == 1) tmp.name = token; //std::atof(token.c_str());
-            //if (i == 2) tmp.from = token;
-            //if (i == 3) tmp.to = token;
             line.erase(0, pos + 1);
 
         }
@@ -83,7 +75,6 @@ void HospitalControlApp::readCrossing(){
     }
 
     MyReadFile.close();
-    //std::string name = "";
     areas = (double *)malloc(this->djisktra->numIVertices*sizeof(double));
     for(int i = 0; i < this->djisktra->numIVertices; i++){
         areas[i] = 0;
@@ -91,8 +82,6 @@ void HospitalControlApp::readCrossing(){
     this->aroundIntersections.resize(this->djisktra->numIVertices);
     for(int i = 0; i < crossings.size(); i++){
         for(int j = 0; j < this->djisktra->numIVertices; j++){
-            //name = this->djisktra->vertices[j];
-            //if(crossings[i].id.compare(name) == 0){
             if(crossings[i].id.compare(this->djisktra->vertices[j]) == 0){
                 this->aroundIntersections[j].push_back(i);
                 areas[j] += crossings[i].rec->getArea();
@@ -114,11 +103,6 @@ void HospitalControlApp::finish()
     if(Constant::activation == NULL){
             EV<<"Constant is helpless eventually"<<endl;
     }
-    //for (auto it = crossings.begin(); it != crossings.end(); it++){
-        //EV<<it->id<<" "<<it->rec->xMin<<endl;
-    //}
-
-    //this->djisktra->expSmoothing->printMaxWeights(this->djisktra->vertices);
 
     EV<<"#calling traci->getPersonIds(): "<<count<<endl;
     EV<<"1) As 10 AGVs => T: 3022(3796), W: 241(1811), %: 8(48)%"<<endl;
@@ -140,7 +124,6 @@ void HospitalControlApp::finish()
     EV<<"17) As case 16 + 24(flow 12) AGVs => T: 7168(10482), W: 622(5369), %: 9(51)%"<<endl;
     EV<<"As 10 + 1(flow 8) AGVs => T: 2709, W: 547, %: 20%"<<endl;
     EV<<"As 10 + 1(flow 2) AGVs => T: 3045.7, W: 875, %: 29%"<<endl;
-    //EV<<"As 11 AGVs => T: 2720.8, W: 547, %: 20%"<<endl;
     EV<<"As 11 AGVs + 1(10) => T: 3239.9, W: 887.7, %: 27.4%"<<endl;
 
     EV<<"Reproduce case "<<17<<") Total waiting time: "<<Constant::TOTAL_WAITING_TIME*0.1<<"(s)"<<endl;
@@ -179,15 +162,12 @@ void HospitalControlApp::onWSM(BaseFrame1609_4 *wsm){
                     }
 
                     double x, y;
-                    //for(int i = 0; i < crossings.size(); i++){
                     for (auto elem: allPeople) {
                         std::string personId = elem;
                         Coord peoplePosition = traci->getPersonPosition(personId);
                         std::pair<double,double> coordTraCI = traci->getTraCIXY(peoplePosition);
-                        //veins::Coord newCoord;
                         x = coordTraCI.first;
                         y = coordTraCI.second;
-                        //newCoord.z = 0;
                         for(int i = 0; i < crossings.size(); i++){
                             if (crossings[i].rec->checkInside(x, y)) {
                                 crossings[i].count++;
@@ -212,16 +192,10 @@ void HospitalControlApp::onWSM(BaseFrame1609_4 *wsm){
             rsuBeacon->setDemoData(ret);
             rsuBeacon->setSenderAddress(myId);
             try{
-                //EV<<"213";
-                /*double t = simTime().dbl();
-                if(t > 216.4){
-                    EV<<"ehree"<<endl;
-                }*/
                 BaseFrame1609_4 *WSM = new BaseFrame1609_4();
                 WSM->encapsulate(rsuBeacon);
                 populateWSM(WSM);
                 send(WSM, lowerLayerOut);
-                //EV<<" 218"<<endl;
             }
             catch(std::exception& e){
                 EV<<e.what()<<endl;
@@ -229,30 +203,13 @@ void HospitalControlApp::onWSM(BaseFrame1609_4 *wsm){
         }
         if(!Constant::SHORTEST_PATH){
             std::string newRoute = readMessage(bc);
-            //newRoute = this->removeAntidromic(newRoute);
             if(newRoute.length() != 0){
-                /*if((newRoute.find("-E234 -E235") != std::string::npos
-                    || newRoute.find("-E230 -E232") != std::string::npos
-                        )
-                    ){
-                    std::stringstream streamData(bc->getDemoData());
-                    std::string content ;
-                    double t = simTime().dbl();
-                    getline(streamData, content);
-                    EV<<"Control what?"<<endl;
-                }*/
-                //EV<<"237";
                 try{
-                    /*double t = simTime().dbl();
-                    if(t > 216.4){
-                        EV<<"ehree"<<endl;
-                    }*/
                     sendToAGV(newRoute);
                 }
                 catch(std::exception& e1){
                     EV<<e1.what()<<endl;
                 }
-                //EV<<"239"<<endl;
             }
         }
     }
@@ -269,10 +226,6 @@ void HospitalControlApp::predictDispearTime(){
         }
         double density = sum/areas[i];
         double velocity = getAverageVelocityByDensity(density);
-        //if(i == 88){
-        /*if(velocity < 0){
-            EV<<"sdsfsdfsdf";
-        }*/
         double predict = Constant::LENGTH_CROSSING*sum*0.5/velocity;
         if(this->djisktra->weightVertices[i] < predict
                 || this->djisktra->expSmoothing->raisedTime[i] < 0
@@ -288,7 +241,6 @@ void HospitalControlApp::predictDispearTime(){
 }
 
 double HospitalControlApp::getAverageVelocityByDensity(double density) {
-//    y = 0.2 * x^2 - 1.1 * x + 1.7
     return 0.2 * density * density - 1.1 * density + 1.7;
 }
 
@@ -354,10 +306,6 @@ void HospitalControlApp::readLane(AGV *cur, std::string str) {
 }
 
 std::string HospitalControlApp::readMessage(TraCIDemo11pMessage *bc) {
-    //double t = simTime().dbl();
-    //if(t > 216.4){
-        //EV<<"dfdffddf";
-    //}
     if(Constant::SHORTEST_PATH)
         return "";
     std::stringstream streamData(bc->getDemoData());
@@ -376,10 +324,8 @@ std::string HospitalControlApp::readMessage(TraCIDemo11pMessage *bc) {
     }
     int i = 0;
     std::string newRoute = "";
-    //bool debugHere = true;
     while (getline(streamData, str, ' ')) {
         if (i == 0) {
-            //debugHere = (str.compare("E293_1") == 0);
             readLane(cur, str);
         } else if (i == 2) {
             if (std::stod(str) == 0) {
@@ -392,16 +338,12 @@ std::string HospitalControlApp::readMessage(TraCIDemo11pMessage *bc) {
                     this->djisktra->expSmoothing->exponentialSmooth(currentIndex,
                                             this->djisktra->weightVertices[currentIndex]);
                 }
-                //debugHere = false;
             }
             else{
 
             }
         }
         if(i == 3){
-            //if(debugHere && str.compare("route_3") == 0){
-            //    EV<<"dsds"<<endl;
-            //}
             newRoute = reRoute(cur, str/*, t*/);
         }
         i++;
@@ -419,17 +361,8 @@ std::string HospitalControlApp::reRoute(AGV *cur, std::string routeId/*, double 
     }
 
     int idOfI_Vertex = this->djisktra->findI_Vertex(cur->itinerary->laneId, false);
-    /*if(this->djisktra->vertices[idOfI_Vertex].compare(cur->itinerary->laneId) == 0){
-        return "";//skip this case, too complex
-    }
-    else{
-
-    }*/
     int src = -1, station = -1, exit = -1;
     int i = -1;
-    //if(t > 216.4){
-        //EV<<"dfdffddf";
-    //}
     if(idOfI_Vertex != cur->reRouteAt){
         for(i = 0; i < this->djisktra->itineraries.size(); i++){
             if(routeId.compare(std::get<0>(this->djisktra->itineraries[i])) == 0){
@@ -468,30 +401,13 @@ std::string HospitalControlApp::reRoute(AGV *cur, std::string routeId/*, double 
         return "";
     }
 
-    //if((idOfI_Vertex == station && i != -1){
-
     int nextDst = (cur->passedStation) ? exit : station;
     if(nextDst > -1){
         if(idOfI_Vertex == nextDst){
             return "";
         }
         this->djisktra->DijkstrasAlgorithm(idOfI_Vertex, nextDst, cur->itinerary->laneId);
-        /*double t = simTime().dbl();
-        if(routeId.compare("route_2") == 0 && t >= 87.15 //&& (cur->id.compare("28") == 0)
-                ){
-            EV<<"New route: "<<t<<endl;
-        }
-        if(routeId.compare("route_11") == 0 && t >= 185.754 && (cur->id.compare("28") == 0)
-                ){
-            EV<<"New route: "<<t<<endl;
-        }*/
         std::string newRoute = this->djisktra->getRoute(this->djisktra->traces[nextDst], cur->itinerary->laneId, idOfI_Vertex, nextDst, exit);
-        /*if(routeId.compare("route_2") == 0 && newRoute.find("-E234 -E235") != std::string::npos){
-            EV<<"New route: "<<t<<endl;
-        }
-        if(routeId.compare("route_11") == 0 && newRoute.find("-E230 -E232") != std::string::npos){
-            EV<<"New route: "<<t<<endl;
-        }*/
         if(nextDst != exit){
             std::string futureLane = ""; //this->djisktra->vertices[nextDst];
             trim_right(newRoute);
@@ -506,46 +422,17 @@ std::string HospitalControlApp::reRoute(AGV *cur, std::string routeId/*, double 
             }
             this->djisktra->DijkstrasAlgorithm(nextDst, exit, futureLane);
 
-            //if(routeId.compare("route_0") == 0 && t >= 7.0){
-            //    EV<<"New route: "<<t<<endl;
-            //}
-
             std::string lastPath =
                     this->djisktra->getRoute(this->djisktra->traces[exit], futureLane, nextDst, exit, exit);
             if(lastPath.find(futureLane + " ") != std::string::npos
                     && newRoute.find(" " + futureLane) != std::string::npos
             ){
-                /*std::string omitedLastPath = "";
-                for(int i = futureLane.length(); i < lastPath.length(); i++){
-                    omitedLastPath = omitedLastPath + lastPath[i];
-                }*/
-                //newRoute = newRoute + " " + omitedLastPath;
-                //if(futureLane.length() + 1>= lastPath.length() || simTime().dbl() > 2.35){
-                //    EV<<"Out of range";
-                //}
                 lastPath = lastPath.substr(futureLane.length() + 1);
             }
-            //else{
-                newRoute = newRoute + " " + lastPath;
-                /*if((newRoute.find("-E230 -E232") != std::string::npos
-                    || newRoute.find("-E232 -E230") != std::string::npos)
-                    //&& simTime().dbl() > 160
-                    ){
-                    double t = simTime().dbl();
-                    EV<<"Control what?"<<endl;
-                }*/
-
-            //}
+            newRoute = newRoute + " " + lastPath;
         }
 
         newRoute = removeAntidromic(newRoute);
-        /*if((newRoute.find("-E81 E202") != std::string::npos
-            || newRoute.find("-E233 -E230") != std::string::npos)
-            //&& simTime().dbl() > 160
-            ){
-            double t = simTime().dbl();
-            EV<<"Control what?"<<endl;
-        }*/
         if(newRoute.length() == 0)
             return "";
         newRoute = "$" + cur->id + "_" + newRoute;

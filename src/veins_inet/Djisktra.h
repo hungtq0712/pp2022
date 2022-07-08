@@ -56,7 +56,6 @@ public:
             fromPedestrians[i] = 0;
         }
         this->readCycicalData();
-        //this->readCrossing();
     }
 
     double exponentialSmooth(int index, double oldPredict){
@@ -114,12 +113,6 @@ public:
                 fromPedestrians[index] = 0;
             }
             return fromPedestrians[index];
-            //if(simTime().dbl() - lastGettingPedestrians > Constant::EXPIRED_TIME){
-            //    lastGettingPedestrians = simTime().dbl();
-            //    double area = 0; int numCrossings = 0;
-                //int count = checkCrossing(nameVertex, &numCrossings, &area);
-                //return this->getDispearTime(count, numCrossings, area);
-            //}
         }
         return predictW;
     }
@@ -152,7 +145,6 @@ public:
     }
 
     double getWait(int index){
-        //return getDampingValue(index, waitTime[index]);
         return waitTime[index];
     }
     void addWait(int index, double x){
@@ -192,7 +184,6 @@ public:
     void getListEdges(std::string weightEdges);
     void createAndAddEdge(//std::vector <Quad> adjList[],
             int u, double weightEdge, double weightVertex, std::string v, int indexOfV);
-    //void generateAdj(std::vector<Quad> adjList[]);
     void generateAdj();
     void DijkstrasAlgorithm(//std::vector<Quad> adjList[],
             int source, int target, std::string currLane);
@@ -221,9 +212,6 @@ private:
     bool isValidTrace(std::string currLane, std::string trace);
 
     int numVertices = 0; // 323 vertices (107 i-vertices and 341 b-vertices)
-    //std::string firstLanes = "$E0$E1$E226$E227$-E92$-E91$-E90$-E298$-E297$-E296$:J3$:J203$:J272$:J273$:J92$:J91$";
-
-    //std::vector <bool> visitedVertex(numVertices, false);
     double *ShortestPath; //[numVertices]; // Have an array to store the shortest path
 };
 

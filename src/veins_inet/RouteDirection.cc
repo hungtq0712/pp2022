@@ -16,7 +16,6 @@
 #include "RouteDirection.h"
 using namespace veins;
 
-//Register_Class(RouteDirection);
 
 RouteDirection::RouteDirection() {
     // TODO Auto-generated constructor stub

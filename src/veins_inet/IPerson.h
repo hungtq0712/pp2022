@@ -43,7 +43,6 @@ protected:
     void handlePositionUpdate(cObject* obj) override;
     void handleLowerMsg(cMessage* msg) override;
 private:
-    //bool sentFirstMessage = false;
 };
 }
 #endif /* VEINS_INET_IPERSON_H_ */

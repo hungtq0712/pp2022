@@ -14,7 +14,6 @@
 // 
 
 #include "AGVControlApp.h"
-//#include "HospitalControlApp.h"
 #include "Constant.h"
 #include "veins/modules/application/traci/TraCIDemo11pMessage_m.h"
 
@@ -45,7 +44,6 @@ void AGVControlApp::initialize(int stage)
         {
             scheduleAt(simTime() + 0.1, sendBeacon);
             this->travellingTime = simTime().dbl();
-            //EV<<"Initialize AGV at "<<simTime().dbl()<<" ";
             curPosition = mobility->getPositionAt(simTime());
         }
         if(Constant::activation == NULL){
@@ -57,9 +55,7 @@ void AGVControlApp::initialize(int stage)
 void AGVControlApp::finish()
 {
     this->travellingTime = //traciVehicle->getWaitingTime();
-    //                    traciVehicle->getAccumulatedWaitingTime();
             simTime().dbl() - this->travellingTime;
-    //EV<<"This AGV spends "<<this->travellingTime<<" for travelling"<<endl;
     Constant::TOTAL_TRAVELLING_TIME += this->travellingTime;
     Constant::TOTAL_WAITING_TIME += this->waitingIntervals;
     TraCIDemo11p::finish();
@@ -94,23 +90,13 @@ void AGVControlApp::handleSelfMsg(cMessage* msg)
     {
         TraCIDemo11pMessage* carBeacon = new TraCIDemo11pMessage("test", 0);
         {
-           content = //std::to_string(simTime().dbl()) + " ";
-           //curPosition = mobility->getPositionAt(simTime());
-           //content = content +
-           //             std::to_string(curPosition.x) + " "
-           //             + std::to_string(curPosition.y);
-           /*content = content +*/ /*"Lid"*/ /*" " +*/
-                   traciVehicle->getLaneId();
+           content = traciVehicle->getLaneId();
            double speed = traciVehicle->getSpeed();
            if(speed == 0.0){
                this->waitingIntervals++;
            }
            content = content + /*"L.P"*/ " " + std::to_string(traciVehicle->getLanePosition());
-           content = content + /*"velo:"*/ " " + std::to_string(speed)
-                           //+ /*"/"*/ " " + std::to_string(traciVehicle->getAcceleration())
-                                   ;
-           //content = content + /*"dis:"*/ " " + std::to_string(traciVehicle->getDistanceTravelled());
-           //content = content + "aW: " + std::to_string(traciVehicle->getAccumulatedWaitingTime());
+           content = content + /*"velo:"*/ " " + std::to_string(speed;
            content = content + " " + originalRoute;
            carBeacon->setDemoData(content.c_str());
            carBeacon->setSenderAddress(myId);
@@ -121,12 +107,6 @@ void AGVControlApp::handleSelfMsg(cMessage* msg)
 
            if(expectedRoute.length() > 0){
                double t = simTime().dbl();
-               /*if(expectedRoute.find("-E230 ") != std::string::npos && t >= 186.0
-               //if(expectedRoute.find("-E230 -E232") != std::string::npos && t >= 186.0
-                      //&& ((traciVehicle->getRouteId()).compare("route_11") == 0)
-               ){
-                   EV<<"dfsdsdfdsfdsf";
-               }*/
                std::string current = traciVehicle->getLaneId();
                int x = current.find("_");
                if(x > 0)
@@ -147,9 +127,6 @@ void AGVControlApp::handleSelfMsg(cMessage* msg)
                        if(change){
                            expectedRoute = "";
                            v.clear();
-                           //v.shrink_to_fit();
-                           //l.clear();
-                           //l.shrink_to_fit();
                        }
                    }catch(std::exception &e){
                        const char* x= e.what();
@@ -178,9 +155,6 @@ void AGVControlApp::handleLowerMsg(cMessage* msg)
         int length = strlen(bc->getDemoData());
         std::string str = std::string(bc->getDemoData(), length);
         if(str.find("$" + std::to_string(myId) + "_") != std::string::npos){
-            /*if(std::to_string(myId).compare("16") != 0){
-                EV<<"dsdssd"<<endl;
-            }*/
             std::string newRoute = str.substr(std::to_string(myId).length() + 2);
             if(prevRoute.compare(newRoute) != 0){
                 if(newRoute.compare("0") == 0){
