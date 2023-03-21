@@ -1,4 +1,4 @@
-#include "/home/asus/Downloads/pugixml-1.13/src/pugixml.hpp"
+#include "pugixml-1.13/src/pugixml.hpp"
 #include <curses.h>
 #include <math.h>
 #include <iostream>
